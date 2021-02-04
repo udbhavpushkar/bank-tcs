@@ -1,6 +1,6 @@
 $def with (page)
-$var css: static/css/materialize.min.css static/css/style.css
-$var js: static/js/materialize.min.js static/js/init.js
+$var css: https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css static/css/style.css
+$var js: https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js static/js/init.js
 
 <html lang="en">
 <head>
@@ -18,7 +18,7 @@ $var js: static/js/materialize.min.js static/js/init.js
         $if sessions['user']!= None:
             <ul class="right">
                 <li class="white-text">Hi $sessions['user'].loginid</li>
-                <li><a href="./logout" id="logoutBtn" class="btn red white-text">Logout</a></li>
+                <li><a href="/logout" id="logoutBtn" class="btn red white-text">Logout</a></li>
             </ul>
     </div>
   </nav>

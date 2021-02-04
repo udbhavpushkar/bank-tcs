@@ -1,5 +1,6 @@
 import web
 import bcrypt
+import time
 web.config.debug = False
 
 urls = (
@@ -8,7 +9,12 @@ urls = (
     '/login', 'Login',
     '/logout', 'Logout',
     '/manageCustomer', 'ManageCustomer',
-    '/createCustomer', 'CreateCustomer'
+    '/createCustomer', 'CreateCustomer',
+    '/addAccount/(.*)', 'AddAccount',
+    '/editCustomer/(.*)', 'EditCustomer',
+    '/deleteCustomer/(.*)', 'DeleteCustomer',
+    '/manageAccount', 'ManageAccount',
+    '/deleteAccount/(.*)', 'DeleteAccount'
 )
 
 db = web.database(dbn='sqlite', db='bankdb')
@@ -18,78 +24,41 @@ session = web.session.Session(app, web.session.DiskStore("sessions"), initialize
 session_data = session._initializer
 
 render = web.template.render("Views/Template", base="MainLayout", globals={'sessions': session_data, 'current_user': session_data['user']})
-'''
-create table customer(
-    -> SSNID varchar(25) NOT NULL,
-    -> Name varchar(25),
-    -> Age varchar(3),
-    -> Address_Line1 varchar(300),
-    -> Address_Line2 varchar(300),
-    -> City varchar(25),
-    -> State varchar(25),
-    -> createdate varchar(25),
-    -> CustomerID varchar(25),
-    -> Unique(SSNID),
-    -> Primary Key(CustomerID));
-
-
-create table Account(
-    -> Account_No varchar(25),
-    -> Balance varchar(25),
-    -> createdate varchar(25),
-    -> CustomerID varchar(25),
-    -> Primary Key(Account_No),
-    -> Foreign Key(CustomerID) references customer(CustomerID));
-
-create table Transaction(
-    -> Source_Acc_No varchar(25) NOT NULL,
-    -> Destination_Acc_No varchar(25) NOT NULL,
-    -> Transaction_ID varchar(25),
-    -> Last_Balance varchar(25),
-    -> Updated_Balance varchar(25),
-    -> createdate varchar(25),
-    -> Primary Key(Transaction_ID));
-'''
 
 
 class Home:
     def GET(self):
-        # q = 'CREATE TABLE employee (id integer primary key, loginid text, pw text, post text, created default current_timestamp)'
-        # db.query(q)
-        # q1 = 'CREATE TABLE'
-
         if session_data['user']:
             web.seeother('/manageCustomer')
         else:
             return render.Home()
 
-
-class Register:
-    def POST(self):
-        data = web.input()
-        # print(data.loginid + " Password : " + data.password)
-        # q = 'CREATE TABLE employee (id integer primary key, loginid text, pw text, post text, created default
-        # current_timestamp)'
-        # db.query(q)
-        # if bcrypt.checkpw()
-        # hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt())
-        # user = db.insert('employee', loginid=data.loginid, pw=hashed)
-        # print(user)
-        return data
-
-
-class Login:
     def POST(self):
         data = web.input()
         myvars = dict(loginid=data.loginid)
         user = db.select("employee", where="loginid=$loginid", vars=myvars, limit=1)
-
         user = list(user)
         if user:
             print(user[0])
             if bcrypt.checkpw(data.password.encode(), user[0].pw):
                 session_data["user"] = user[0]
+                web.seeother('/manageCustomer')
                 return True
+        else:
+            web.seeother('/')
+
+
+class Register:
+
+    def GET(self):
+        return render.Register()
+
+    def POST(self):
+        data = web.input()
+        hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt())
+        user = db.insert('employee', loginid=data.loginid, pw=hashed, post=data.custType)
+        if user:
+            return True
         return False
 
 
@@ -104,12 +73,68 @@ class Logout:
 
 class ManageCustomer:
     def GET(self):
-        return render.ManageCustomer()
+        customers = db.select('customer')
+        customers = list(customers)
+        for customer in customers:
+            print(customer)
+        return render.ManageCustomer(customers)
+
+
+class ManageAccount:
+    def GET(self):
+        accounts = db.select('account')
+        accounts = list(accounts)
+        return render.ManageAccount(accounts)
 
 
 class CreateCustomer:
     def GET(self):
-        return render.CreateCustomer()
+        cust = False
+        return render.CreateCustomer(cust)
+
+    def POST(self):
+        data = web.input()
+        cust = db.insert('customer', ssnid=data.ssnid, name=data.name, age=data.age, address=data.address, city=data.city, state=data.state)
+        print(cust)
+        if cust:
+            return render.CreateCustomer(cust)
+        else:
+            pass
+
+
+class AddAccount:
+    def GET(self, custId):
+        acc = str(time.time())
+        acc = acc.replace(".", "")
+        added = db.insert('account', account_no=acc, customerid=custId, balance=0)
+        return web.seeother('/manageCustomer')
+
+
+class EditCustomer:
+    def GET(self, customerId):
+        myvars = dict(customerId=customerId)
+        customer = db.select("customer", where="customerId=$customerId", vars=myvars, limit=1)
+        print(type(customer))
+        customer = list(customer)
+        print(type(customer))
+        return render.EditCustomer(customer)
+
+
+class DeleteCustomer:
+    def GET(self, customerId):
+        delCustomer = db.delete('customer', where="customerid=$"+customerId)
+        if delCustomer:
+            web.seeother('/manageCustomer')
+
+class DeleteAccount:
+    def GET(self, account_no):
+        delAccount = db.delete('account', where="account_no=$"+account_no)
+        if delAccount:
+            web.seeother('/manageAccount')
+
+
+
+
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-$def with (customers)
+$def with (accounts)
 <div class="center" style="margin-top: 20px">
     <a href="/manageCustomer" class="waves-effect btn-block waves-light btn">Manage Customer</a>
     <a href="/createCustomer" class="waves-effect btn-block waves-light btn">Create Customer</a>
@@ -6,7 +6,7 @@ $def with (customers)
 </div>
 <div class="container" style="margin-top: 50px">
     <div class="row">
-        <h2>Manage Customer</h2>
+        <h2>Manage Account</h2>
         <div class="col s12">
             <form action="">
                 <div class="row">
@@ -23,24 +23,22 @@ $def with (customers)
                 <table>
         <thead>
           <tr>
-              <th>CustomerID</th>
-              <th>SSN ID</th>
-              <th>Name</th>
-              <th>Create Account</th>
-              <th>Edit</th>
+              <th>Account No</th>
+              <th>Customer Id</th>
+              <th>Balance</th>
+              <th>Create Time</th>
               <th>Delete</th>
           </tr>
         </thead>
 
         <tbody>
-        $for customer in customers:
+        $for account in accounts:
             <tr>
-                <td>$customer.customerId</td>
-                <td>$customer.ssnid</td>
-                <td>$customer.name</td>
-                <td><a href="/addAccount/$customer.customerId" class="btn circle"><i class="material-icons">add</i></a></td>
-                <td><a href="/editCustomer/$customer.customerId" class="btn circle"><i class="material-icons">create</i></a></td>
-                <td><a href="/deleteCustomer/$customer.customerId" onclick="return confirm('Are you sure ? ')" class="btn circle red"><i class="material-icons">delete</i></a></td>
+                <td>$account.account_no</td>
+                <td>$account.customerid</td>
+                <td>$account.balance</td>
+                <td>$account.created</td>
+                <td><a href="/deleteAccount/$account.account_no" onclick="return confirm('Are you sure ?')" class="btn circle red"><i class="material-icons">delete</i></a></td>
             </tr>
         </tbody>
       </table>

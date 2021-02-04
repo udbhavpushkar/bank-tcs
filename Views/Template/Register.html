@@ -1,8 +1,8 @@
-<h3 class="">Employee Login</h3>
+<h3 class="">Employee Register</h3>
 <div class="row">
-    <a href="/register" class="right btn blue">Register</a>
+    <a href="/" class="right btn blue">Login</a>
     <div class="container" style="width: 30% !important;">
-        <form method="post" id="login-form" class="col s12">
+        <form method="post" id="register-form" class="col s12">
             <div class="row">
                 <div class="input-field col s12">
                     <input autocomplete="off" id="loginid" name="loginid" type="text">
@@ -15,7 +15,14 @@
                     <label for="password">Password</label>
                 </div>
             </div>
-            <button class="btn waves-effect waves-light" type="submit" id="login" name="login">Login
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="type" name="custType" type="text">
+                    <label for="type">Employee Type</label>
+                </div>
+            </div>
+            <button class="btn waves-effect waves-light" type="submit" id="register" name="register">Register
                 <i class="material-icons right">login</i>
             </button>
         </form>
